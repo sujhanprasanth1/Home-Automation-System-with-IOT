@@ -1,57 +1,95 @@
 # Home-Automation-System-with-IOT
 
 # AIM: 
-  To make a Lamp at home (230 V AC) On / Off using ESP8266, IFTT Google Assistance and Blynk IoT mobile application.          
+  To make a Lamp at home (230 V AC) On / Off using Arduino UNO R4 WiFi board, IFTT Google Assistance and Blynk IoT mobile application.          
            
 # COMPONENTS REQUIRED:
-PC with Internet connection
-Micro USB cable
-Wifi connection for ESP8266 (Use any mobile hotspot or Router)
-	ESP8266 Board
-	Mobile Phone with Blynk App installed
-            IFTT for Google Voice Assistance
-	9 W Bulb and Relay control
-Arduino software 
-Jumper Wires
+PC/Laptop with Internet connection
+Arduino UNO R4 WiFi board
+USB cable compatible with Arduino UNO R4 WiFi
+Wi-Fi connection (mobile hotspot or Wi-Fi router)
+Mobile phone with Blynk IoT app installed
+Arduino IDE
+Blynk account
+Built-in LED of Arduino UNO R4 WiFi
 
 ## Theory: 
-Blynk is an IoT platform for iOS or Android smartphones that is used to control Arduino, Raspberry Pi and NodeMCU via the Internet. This application is used to create a graphical interface or human machine interface (HMI) by compiling and providing the appropriate address on the available widgets.In this experiment we use ESP8266 to control a 220-volt lamp from a web server. But you can also use the same procedure to control fans, lights, AC, or other electrical devices that you want to control remotely.
-Relay is an electromechanical device that is used as a switch between high current and low current devices. When the coil in the relay gets fully energized, the contact shifts from the normally open position to the normally closed position. Light bulbs usually operate on 120V or 220V AC power supply. We cannot interface these AC loads directly with the ESP8266 development board, or it will damage the board. We have to use a relay between the ESP8266 and the lamp. 
-Google Assistant and IFTTT work together to let you control services with voice commands. When you say a set phrase, Google Assistant processes it and sends it to IFTTT as a trigger. If the phrase matches an applet you've created, IFTTT performs the linked action—like turning on a light or sending a message. Everything runs in the cloud, making it easy to automate tasks with just your voice, as long as the command is correctly matched and all services are online.
-When we apply an active high signal to the signal pin of the relay module from any microcontroller like ESP8266, the relay contact moves from the normally open to the normally closed position. It makes the circuit complete, and the output load turns on.
+Blynk is an IoT platform that allows microcontroller boards to be controlled and monitored through a mobile application over the Internet. It provides a graphical interface using widgets such as buttons, switches, displays, and gauges.
 
+In this experiment, the Arduino UNO R4 WiFi is connected to a Wi-Fi network and linked to the Blynk IoT platform. A button widget in the Blynk mobile application is used to control the built-in LED of the Arduino UNO R4 WiFi remotely.
+
+When the button in the Blynk application is switched ON, a command is sent through the Internet to the Arduino UNO R4 WiFi, causing its built-in LED to turn ON. When the button is switched OFF, the command is sent to the board and the LED turns OFF.
+
+The Arduino UNO R4 WiFi has built-in Wi-Fi connectivity, so no external Wi-Fi module such as ESP8266 is required. Since the experiment uses the built-in LED, no external relay or AC bulb is required.
 # PROCEDURE:
 
-•	Make the circuit connection as per the diagram. In the mobile, download and “Blynq IoT” application using Google play store and Install it. Create log in ID and Password.
-•	Connect the IN pin of the Relay module to D1 pin of NodeMCU (ESP8266).
-•	Connect VCC of the Relay of NodeMCU. Connect GND of the Relay to GND of NodeMCU. 
-•	Connect your AC bulb to the Relay’s switch terminal securely.
-•	Install ESP8266 board in Arduino IDE via Board Manager. Select board: NodeMCU 1.0 (ESP-12E Module).
-•	Include necessary libraries: ESP8266WiFi and ESP8266WebServer.
-•	In the code, configure Wi-Fi SSID and Password.
-•	Set up a web server that responds to /on and /off URLs.
-•	Upload the code to the ESP8266 using a micro USB cable.
-•	Get Local IP Address After uploading, open Serial Monitor to find the local IP address of ESP8266.
-•	Create Applets on IFTTT - For "This", select Google Assistant → "Say a simple phrase". Command: "Turn on the light". For "That", choose Webhooks → "Make a web request". 
-•	Repeat to create another applet for command with URL.
-•	Test the System - Google Assistant triggers IFTTT → sends Webhook to ESP8266 → turns ON the relay (light).
-•	Say "Turn off the ligh to switch it OFF, Say "Turn on the light" to switch it ON.
+Connect the Arduino UNO R4 WiFi to the PC/laptop using a suitable USB cable.
+Install and open Arduino IDE on the computer.
+Install/select the Arduino UNO R4 WiFi board from the Arduino board package.
+Install the Blynk library in Arduino IDE.
+Download and install the Blynk IoT application on the mobile phone and create/login to a Blynk account.
+Create a new Blynk template/device and add a Button widget.
+Configure the button as a switch and assign a virtual datastream, such as V0.
+Configure the Wi-Fi SSID and password in the Arduino program along with the required Blynk authentication details.
+In the Arduino program, configure the built-in LED as the output and associate the Blynk button with the LED control.
+Select Arduino UNO R4 WiFi as the board and select the appropriate COM port.
+Compile and upload the program to the Arduino UNO R4 WiFi.
+Connect the Arduino UNO R4 WiFi to the Internet through a Wi-Fi network or mobile hotspot.
+Open the Blynk application on the mobile phone.
+Press the ON button in the Blynk application. The command is sent through the Internet to the Arduino UNO R4 WiFi, and the built-in LED turns ON.
+Press the OFF button. The Arduino receives the command and the built-in LED turns OFF.
+Thus, the built-in LED of the Arduino UNO R4 WiFi is successfully controlled remotely using the Blynk IoT application.
 
 # CIRCUIT DIAGRAM:
 
-<img width="663" height="400" alt="image" src="https://github.com/user-attachments/assets/bfebc70d-25b4-4b4a-a7e1-2a02c09bf423" />
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/707cbbff-a867-45bf-92d3-786a3244d2ab" />
 
 
  
 # PROGRAM:
+```
+#define BLYNK_TEMPLATE_ID "TMPL3FC5OeIaF"
+#define BLYNK_TEMPLATE_NAME "LED Control"
+#define BLYNK_AUTH_TOKEN "YOUR_NEW_AUTH_TOKEN"
 
+#define BLYNK_PRINT Serial
 
- 
+#include <WiFiS3.h>
+#include <BlynkSimpleWifi.h>
+
+char ssid[] = "YOUR_WIFI_NAME";
+char pass[] = "YOUR_WIFI_PASSWORD";
+
+BLYNK_WRITE(V0)
+{
+  int value = param.asInt();
+  digitalWrite(LED_BUILTIN, value);
+}
+
+void setup()
+{
+  Serial.begin(115200);
+
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+
+  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
+}
+
+void loop()
+{
+  Blynk.run();
+}
+ ```
 # Output:
 
+<img width="1280" height="960" alt="WhatsApp Image 2026-08-20 at 10 34 43 AM" src="https://github.com/user-attachments/assets/ce863ea4-81a7-42bd-9fca-b6898f65a17c" />
 
+https://github.com/user-attachments/assets/3767ff62-93f4-467e-82c5-7a1dc9634ca3
 
 ## Result:
+The Arduino UNO R4 WiFi built-in LED was successfully controlled remotely using the Blynk IoT application. When the Blynk button was switched ON, the built-in LED turned ON, and when switched OFF, the LED turned OFF successfully.
+
 
 
 
